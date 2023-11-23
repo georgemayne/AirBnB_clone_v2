@@ -115,15 +115,29 @@ class HBNBCommand(cmd.Cmd):
 
     def do_create(self, args):
         """ Create an object of any class"""
-        args = arg.split()
-        if len(args) == 0:
-            print("** class name missing **")
-            return False
-        if args[0] in classes:
-            new_dict = self._key_value_parser(args[1:])
-            instance = classes[args[0]](**new_dict)
-        else:
-            print("** class doesn't exist **")
-            return False
-        print(instance.id)
-        instance.save()
+        try:
+            if not line:
+                raise SyntaxError()
+            my_lists = line.split(" ")
+            kwargs = {}
+            for g in range(1, len(my_lists)):
+                key, value = tuple(my_lists[g].split("="))
+                if value[0] == '"':
+                    value = value.strip('"').replace("_", " ")
+                else:
+                    try:
+                        value = eval(value)
+                    except (SyntaxError, NameError):
+                        continue
+                    kwargs[key] = value
+
+                if kwargs == {}:
+                    objs = eval(my_lists[0])(**kwargs)
+                    storage.new(objs)
+                    print(objs.id)
+                    objs.save()
+
+                except SyntaxError:
+                    print("** class name missing **")
+                except NameError:
+                    print("** class doesn't exist **")
