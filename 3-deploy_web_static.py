@@ -1,6 +1,6 @@
 #!/usr/bin/python3
-"""distributes an archive to web servers using Fabric."""
-from fabric.api import env, put, run
+"""Distributes an archive to web servers using Fabric."""
+from fabric.api import env, put, run, local
 import os
 from datetime import datetime
 from pathlib import Path
@@ -25,7 +25,7 @@ def do_pack():
 
 
 def do_deploy(archive_path):
-    """Deploy the archive files to erb server
+    """Deploy the archive files to web server
     """
     if os.path.exists(archive_path):
         archived_file = archive_path[9:]
@@ -45,4 +45,13 @@ def do_deploy(archive_path):
         print("New version deployed!")
         return (True)
 
-    return (False)
+    return (False)
+
+
+def deploy():
+    """Full deployment process"""
+    archive_path = do_pack()
+    if not archive_path:
+        return False
+
+    return do_deploy(archive_path)
